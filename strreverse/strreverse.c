@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void *strreverse( char *src )
+void strreverse( char *src )
 {
     int end = 0;
     int beg = 0;
