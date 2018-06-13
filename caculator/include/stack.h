@@ -2,7 +2,7 @@
 #define MAX_DIGITAL 8
 #define MAX_SIZE 72
 struct stack {
-    char element[MAX_DIGITAL][MAX_SIZE];
+    char element[MAX_SIZE][MAX_DIGITAL];
     int top;
 };
 
