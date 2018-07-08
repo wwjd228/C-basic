@@ -60,6 +60,8 @@ void *j_strcpy(char *dest, char *src)
 
 void main(void)
 {
+    char *strp = "Hello World";
+    printf("size of pointer string \"Hello World\" = %lu\n", sizeof(strp) / sizeof(strp[0]));
     // pointer string cannot be modified.
     // string function like strcpy() won't to allocate memory space.
     char str[11] = "Hello World";
