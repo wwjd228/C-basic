@@ -14,5 +14,6 @@ union header {
 
 typedef union header _header_t;
 
+void *mycalloc(unsigned n, unsigned size);
 void *mymalloc(unsigned nbytes);
 void myfree(void *ap);

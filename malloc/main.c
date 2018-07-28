@@ -12,7 +12,12 @@ int main(void)
     str[5] = '\0';
 
     printf("%s\n", str);
+
+    int *nums = mycalloc(3, 4);
+    printf("%d, %d, %d\n", nums[0], nums[1], nums[2]);
+
     myfree(str);
+    myfree(nums);
 
     return 0;
 }

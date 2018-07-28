@@ -18,6 +18,18 @@ static inline _header_t *morecore(unsigned nu)
     return freep;
 }
 
+void *mycalloc(unsigned n, unsigned size)
+{
+    unsigned nb = n * size;
+    char *p;
+
+    if ( (p = mymalloc(nb)) != NULL ) {
+        while ( --nb )
+            p[nb] = 0;
+    }
+
+    return (void *)p;
+}
 
 void *mymalloc(unsigned nbytes)
 {
