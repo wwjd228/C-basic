@@ -2,7 +2,7 @@
 
 #define NALLOC 1024
 
-typedef long _align;
+typedef long long _align;
 
 union header {
     struct {
