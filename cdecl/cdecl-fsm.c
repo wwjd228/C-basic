@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "cdecl.h"
+#include "cdecl-fsm.h"
 #include "j_string.h"
+
+static void (*next_status)(void);
 
 int top = -1;
 #define POP stack[top--]
@@ -58,83 +60,89 @@ void get_token(void)
     return;
 }
 
-void read_to_first_identifier(void) {
+/* status "initialize": read to first indentifier */
+void initialize(void)
+{
     get_token();
-    while(IDENTIFIER != this_token.type) {
+    while (IDENTIFIER != this_token.type) {
         PUSH(this_token);
         get_token();
     }
 
     printf("%s is ", this_token.string);
     get_token();
+    next_status = get_array;
 }
 
-/* deal with arg of function */
-void deal_with_function_args(void)
+/* status "get_lparen": deal with '(' */
+void get_lparen(void)
 {
-    while (')' != this_token.type)
+    next_status = get_ptr_part;
+    if (0 <= top) {
+        if ('(' == stack[top].type) {
+            POP;
+            get_token();
+            next_status = get_array;
+        }
+    }
+}
+
+/* status "get_param": deal with arg of function */
+void get_param(void)
+{
+    next_status = get_lparen;
+    if ('(' == this_token.type) {
+        while (')' != this_token.type) get_token();
         get_token();
-    get_token();
-    printf("function returning ");
+        printf("function returning ");
+    }
 }
 
-/* deal with array */
-void deal_with_arrays(void)
+/* status "get_array" deal with array */
+void get_array(void)
 {
+    next_status = get_param;
     while ('[' == this_token.type) {
         printf("array ");
         get_token();
         if (isdigit(this_token.string[0])) {
-            printf("0..%d ", atoi(this_token.string) - 1);
+            printf("0...%d ", atoi(this_token.string) - 1);
             get_token(); /* read ']' */
         }
 
         get_token();
         printf("of ");
+        next_status = get_lparen;
     }
 }
 
-/* deal with pointer */
-void deal_with_pointers(void)
+/* status "get_ptr_part": deal with pointer */
+void get_ptr_part(void)
 {
-    while ('*' == stack[top].type)
+    next_status = get_type;
+    if ('*' == stack[top].type) {
+        printf("pointer to");
+        POP;
+        next_status = get_lparen;
+    }
+    else if (QUALIFIER == stack[top].type) {
         printf("%s ", POP.string);
+        next_status = get_lparen;
+    }
 }
 
-/* deal with declarator */
-void deal_with_declarator(void)
+/* status "get_type": deal with the token in stack */
+void get_type(void)
 {
-    /* deal with array/function */
-    switch(this_token.type) {
-        case '[': /* array */
-            deal_with_arrays();
-            break;
-        case '(': /* function */
-            deal_with_function_args();
-            break;
-        default:
-            break;
-    }
-
-    deal_with_pointers;
-
-    /* deal with stack before identifier */
-    while (0 <= top) {
-        if ('(' == stack[top].type) {
-            POP;
-            get_token();
-            deal_with_declarator();
-        }
-        else
-            printf("%s ", POP.string);
-    }
+    next_status = NULL;
+    while (0 <= top) printf("%s ", POP.string);
+    printf("\n");
 }
 
 int main(void)
 {
-    /* push the tokens into stack until identifier */
-    read_to_first_identifier();
-    deal_with_declarator();
-    printf("\n");
+    next_status = initialize;
+
+    while (NULL != next_status) next_status();
     return 0;
 }

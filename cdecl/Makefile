@@ -1,6 +1,8 @@
 CFLAGS = -I include
-all: cdecl
+all: cdecl cdecl-fsm
 cdecl: cdecl.c
 	gcc -o $@ $^ ${CFLAGS}
+cdecl-fsm: cdecl-fsm.c
+	gcc -o $@ $^ ${CFLAGS}
 clean:
-	rm cdecl
+	rm cdecl cdecl-fsm
