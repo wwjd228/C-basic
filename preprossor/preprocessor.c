@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define MAX(a, b) (a > b ? a : b)
-#define sqrt(x) (x * x)
+#define sqrt(x) (x) * (x)
 #define wrong_sqrt(x) x * x
 #define str(exp) #exp
 #define expcat(exp1, exp2) (exp1 ## exp2)
