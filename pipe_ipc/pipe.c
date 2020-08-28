@@ -23,7 +23,10 @@ int main(int argc, char *argv[])
     }
 
     r_cpid = fork();
-    w_cpid = fork();
+    if (r_cpid != 0) {
+        /* r child does NOT fork */
+        w_cpid = fork();
+    }
     if ((-1 == w_cpid) || (-1 == r_cpid)) {
         perror("fork");
         exit(-1);
